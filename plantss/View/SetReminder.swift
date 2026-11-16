@@ -1,39 +1,47 @@
 import SwiftUI
 
 struct SetReminder: View {
+    var onSave: (Plant) -> Void
+    var onCancel: () -> Void
 
     @Environment(\.dismiss) var dismiss
-
+    
     @State private var name = ""
     @State private var room = "Bedroom"
     @State private var light = "Full sun"
     @State private var days = "Every day"
     @State private var water = "20-50 ml"
-
+    
     var body: some View {
         VStack(spacing: 40) {
-
+            
             // الشريط العلوي
             HStack {
-                Button { dismiss() } label: {
+                Button {
+                    onCancel()
+                } label: {
+                    
                     Image(systemName: "xmark")
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
                         .background(Color.gray.opacity(0.3), in: Circle())
                 }
-
+                
                 Spacer()
                 Text("Set Reminder").font(.headline)
                 Spacer()
-
-                Button { dismiss() } label: {
+                
+                Button {
+                    let plant = Plant(name: name, room: room, light: light, days: days, water: water)
+                    onSave(plant)
+                } label: {
                     Image(systemName: "checkmark")
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
                         .background(Color("buttonsColor"), in: Circle())
                 }
             }
-
+            
             // اسم النبتة
             HStack {
                 Text("Plant Name")
@@ -41,7 +49,7 @@ struct SetReminder: View {
             }
             .padding()
             .background(Color(.systemGray5), in: Capsule())
-
+            
             // Room + Light
             VStack(spacing: 0) {
                 row("location", "Room", ["Bedroom", "Living Room", "Kitchen", "Balcony", "Bathroom"], $room)
@@ -50,7 +58,7 @@ struct SetReminder: View {
             }
             .padding(.horizontal)
             .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 24))
-
+            
             // Watering Days + Water
             VStack(spacing: 0) {
                 row("drop", "Watering Days", ["Every day", "Every 2 days", "Every 3 days", "Once a week", "Every 10 days", "Every 2 weeks"], $days)
@@ -59,13 +67,13 @@ struct SetReminder: View {
             }
             .padding(.horizontal)
             .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 24))
-
+            
             Spacer()
         }
         .padding(.horizontal, 16)
         .padding(.top, 20)
     }
-
+    
     // صف واحد: أيقونة + اسم + قائمة اختيار
     func row(_ icon: String, _ title: String, _ options: [String], _ selection: Binding<String>) -> some View {
         HStack {
@@ -80,12 +88,10 @@ struct SetReminder: View {
         .frame(height: 40)
     }
 }
-
-// الـ Preview يعرضها كـ Sheet مثل التصميم
+    // الـ Preview يعرضها كـ Sheet مثل التصميم
 #Preview {
-    Color.black.ignoresSafeArea()
-        .sheet(isPresented: .constant(true)) {
-            SetReminder()
-        }
-        .preferredColorScheme(.dark)
+    SetReminder(
+        onSave: { _ in },
+        onCancel: {}
+    )
 }

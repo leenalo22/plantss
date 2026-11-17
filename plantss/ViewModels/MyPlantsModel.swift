@@ -20,6 +20,16 @@ class MyPlantModel {
     }
     
     func addPlant(_ plant: Plant) {
+        // 🆕 إذا كل التذكيرات خلصت (كلها ✓)، نمسح القديمة ونبدأ من جديد
+        if !plants.isEmpty && plants.allSatisfy(\.isDone) {
+            // نلغي إشعارات النباتات القديمة عشان ما تجي بعدين
+            for oldPlant in plants {
+                PlantNotificationManager.cancel(for: oldPlant)
+            }
+            // نمسح القائمة كاملة
+            plants.removeAll()
+        }
+
         plants.append(plant)
         hasStarted = true
         Task { await PlantNotificationManager.schedule(for: plant) }
@@ -61,4 +71,3 @@ class MyPlantModel {
         : "\(doneCount) of your plants feel loved today✨"
     }
 }
-//يدير بيانات النباتات في التطبيق، ويحدد الشاشة المناسبة، ويضيف النباتات أو يحذفها ويعدّلها، ويتابع عدد النباتات المسقيّة ونسبة الإنجاز

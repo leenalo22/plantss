@@ -2,20 +2,24 @@ import UserNotifications
 
 enum PlantNotificationManager {
     static func schedule(for plant: Plant) async {
+        //يجيب مركز الإشعارات
         let center = UNUserNotificationCenter.current()
 
         do {
+//يستأذن المستخدم
             let allowed = try await center.requestAuthorization(
                 options: [.alert, .sound]
             )
             guard allowed else { return }
 
             let content = UNMutableNotificationContent()
+            //يكتب الرسالة
             content.title = "Planto"
             content.body = "Hey! Let's water your \(plant.name) 🌱"
             content.sound = .default
 
             let days: Double
+            //يحدد متى توصل
             switch plant.days {
             case "Every 2 days": days = 2
             case "Every 3 days": days = 3
@@ -26,9 +30,11 @@ enum PlantNotificationManager {
             }
 
             let trigger = UNTimeIntervalNotificationTrigger(
+                //يحوّل اختيار المستخدم لرقم أيام. مثلًا Once a week تصير 7.
                 timeInterval: days * 24 * 60 * 60,
                 repeats: true
             )
+            //يرسل الطلب
             let request = UNNotificationRequest(
                 identifier: "plant-\(plant.id.uuidString)",
                 content: content,

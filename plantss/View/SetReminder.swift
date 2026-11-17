@@ -40,6 +40,10 @@ struct SetReminder: View {
                         .frame(width: 44, height: 44)
                         .background(Color("buttonsColor"), in: Circle())
                 }
+                //الزر ما يشتغل إذا الاسم فاضي
+                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+
+                .opacity(name.trimmingCharacters(in: .whitespaces).isEmpty ? 0.4 : 1)
             }
             
             // اسم النبتة

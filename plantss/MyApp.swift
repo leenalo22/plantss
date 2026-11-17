@@ -11,6 +11,9 @@ struct plantssApp: App {
             //يشارك البيانات مع الشاشات.
                 .environment(viewModel)
                 .preferredColorScheme(.dark)
+            
+            
+            
         }
     }
 }

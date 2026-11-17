@@ -3,6 +3,7 @@ import SwiftUI
 
 struct AllCompleted: View {
     @State private var showSetReminder = false
+    //هذا السطر يجيب MyPlantModel المشترك إلى شاشة AllCompleted، عشان تقدر تضيف نبتة جديدة لما تضغطين +.
     @Environment(MyPlantModel.self) private var viewModel
 
     var body: some View {
@@ -22,25 +23,27 @@ struct AllCompleted: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 164, height: 200)
-                .padding(.top, 77)
+                .padding(.top, 127)
 
             Text("All Done! 🎉")
                 .font(.system(size: 25, weight: .bold))
-                .padding(.top, 37)
+                .padding(.top, 60)
 
             Text("All Reminders Completed")
                 .font(.system(size: 16))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .frame(width: 315)
-                .padding(.top, 25)
+                .padding(.top, 14)
 
             Spacer()
         }
         .frame(maxHeight: .infinity)
         .ignoresSafeArea()
+        //هذا يضيف زرًا فوق الشاشة ويحطه في الزاوية السفلية اليمنى.
         .overlay(alignment: .bottomTrailing) {
             Button {
+                //لما تضغطين زر +، يصير المتغير true، فتفتح صفحة إضافة التذكير.
                 showSetReminder = true
             } label: {
                 Image(systemName: "plus")
@@ -48,11 +51,15 @@ struct AllCompleted: View {
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
             }
+            //يعطي الزر شكلًا زجاجيًا بلون buttonsColor، ويتفاعل بصريًا مع اللمس.
             .glassEffect(.regular.tint(Color("buttonsColor")).interactive())
             .padding(.trailing, 20)
             .padding(.bottom, 40)
         }
-        .sheet(isPresented: $showSetReminder) {
+        //لما تضغطين + تفتح صفحة الإضافة. داخلها:
+        //- تضغطين ✓: يقفلها ويحفظ النبتة في القائمة.
+       // - تضغطين X: يقفلها بدون حفظ.
+            .sheet(isPresented: $showSetReminder) {
             SetReminder(
                 onSave: { newPlant in
                     showSetReminder = false

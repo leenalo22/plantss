@@ -21,4 +21,6 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(MyPlantModel())
+    //يعطي المعاينة موديلًا تجريبيًا عشان تقدر تعرض الشاشة.
 }
+//يسأل الموديل عن اسم الشاشة، ثم يفتحها:

@@ -8,5 +8,7 @@ struct Plant: Identifiable {
     var days: String
     var water: String
     var isDone = false
+    var reminderHour: Int = 9
+    var reminderMinute: Int = 0
 }
 

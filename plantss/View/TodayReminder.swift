@@ -13,99 +13,108 @@ struct TodayReminder: View {
 
     var body: some View {
 
-        // VStack: يرتب كل الصفحة فوق بعض
         VStack(spacing: 4) {
 
-            // العنوان
             Text("My Plants 🌱")
                 .font(.system(size: 34, weight: .bold))
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.leading, 16)
                 .padding(.top, 83)
 
-            // الخط الفاصل تحت العنوان
             Rectangle()
                 .fill(Color("dividerColor"))
                 .frame(height: 1)
                 .padding(.top, 20)
 
-            // الجملة: الـ ViewModel هو اللي يقرر وش يكتب (حسب كم نبتة انسقت)
+//يأخذ الجملة من الموديل، والموديل يختارها حسب عدد النباتات المسقيّة. هذا السطر يعرضها على الشاشة.
             Text(viewModel.message)
                 .font(.system(size: 14))
                 .padding(.top, 20)
 
-            // الشريط: يتعبّى حسب النسبة اللي يحسبها الـ ViewModel
-            // scaleEffect: يكبّره بالارتفاع عشان يصير أسمك مثل التصميم
+          //  يعرض شريط التقدّم حسب نسبة النباتات المسقيّة
             ProgressView(value: viewModel.progress)
                 .tint(Color("buttonsColor"))
                 .scaleEffect(x: 1, y: 2)
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
 
-            // القائمة: List يمر على كل نبتة ويسوي لها صف
-            // نقدر نمر على plants لأن Plant فيها Identifiable (كل وحدة لها id)
-            List(viewModel.plants) { plant in
+            // 🆕 بدل List استخدمنا ScrollView + LazyVStack
+            // لأن List في iOS الجديد يرسم شكل الحذف بنفسه (مربع رمادي + دائرة حمرا) وما نقدر نغيّره
+            ScrollView {
+                // 🆕 LazyVStack: مثل VStack بس يرسم الصفوف اللي تبان على الشاشة بس (أخف)
+                LazyVStack(spacing: 0) {
 
-                // صف النبتة: الدائرة جنب النص
-                HStack(spacing: 12) {
+//List تعرض كل نبتة في viewModel.plants بصف لحالها. plant هي النبتة اللي يعرض صفّها الآن.
+                    // 🆕 الحين ForEach هو اللي يسوي صف لكل نبتة بدل List
+                    ForEach(viewModel.plants) { plant in
 
-                    // زر الدائرة: يعلّم النبتة (انسقت / ما انسقت)
-                    // الصفحة ما تغيّر البيانات بنفسها، تطلب من الـ ViewModel
-                    Button {
-                        viewModel.toggle(plant)
-                    } label: {
-                        // الأيقونة تتغير حسب isDone: صح إذا انسقت، ودائرة فاضية إذا لا
-                        Image(systemName: plant.isDone ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 24))
-                            .foregroundStyle(plant.isDone ? Color(red: 0.43, green: 0.91, blue: 0.70) : .gray)
-                    }
-                    // plain: ضروري داخل القائمة، وإلا الصف كله يصير زر
-                    .buttonStyle(.plain)
+                        // 🆕 نلف الصف بـ SwipeToDelete (مكتوب تحت) عشان نسحبه ويطلع زر السلة
+                        SwipeToDelete {
+                            withAnimation {
+                                viewModel.delete(plant)
+                            }
+                        } content: {
 
-                    // نص النبتة: الغرفة، الاسم، الشارات (فوق بعض)
-                    VStack(alignment: .leading, spacing: 4) {
+//يرتّب العناصر جنب بعض
+                            HStack(spacing: 12) {
 
-                        // الغرفة مع السهم
-                        HStack(spacing: 4) {
-                            Image(systemName: "location")
-                            Text("in \(plant.room)")
+                                // زر الدائرة: يعلّم النبتة (انسقت / ما انسقت)
+//إذا ضغطتِ الزر جنب النبتة، toggle(plant) يضيف علامة الصح أو يشيلها. هذا كل دوره.
+                                Button {
+                                    viewModel.toggle(plant)
+                                } label: {
+
+//هذا يحدد شكل الدائرة: إذا النبتة مسقيّة تظهر علامة صح خضراء، وإذا ما انسقت تظهر دائرة رمادية
+                                    Image(systemName: plant.isDone ? "checkmark.circle.fill" : "circle")
+                                        .font(.system(size: 24))
+                                        .foregroundStyle(plant.isDone ? Color(red: 0.43, green: 0.91, blue: 0.70) : .gray)
+                                }
+//يخلي الزر يظهر بشكل الدائرة فقط، بدون شكل أو خلفية الزر الافتراضية.
+                                .buttonStyle(.plain)
+
+                                // نص النبتة: الغرفة، الاسم، الشارات (فوق بعض)
+                                VStack(alignment: .leading, spacing: 4) {
+
+                                  //  يعرض أيقونة الموقع وبجانبها اسم غرفة النبتة. \(plant.room) تحط اسم الغرفة المحفوظ، مثل in Bedroom.
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "location")
+                                        Text("in \(plant.room)")
+                                    }
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+
+                                    // اسم النبتة
+                                    Text(plant.name)
+                                        .font(.title3)
+
+                                    // الشارتين: الإضاءة والماء
+                                    HStack(spacing: 6) {
+                                        badge(plant.light, icon: "sun.max", iconColor: Color("Yellow"), textColor: Color("Yellow"))
+                                        badge(plant.water, icon: "drop", iconColor: Color("LightCyan"), textColor: Color("LightCyan"))
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                // contentShape: يخلي الضغط يشتغل حتى على الفراغات
+                                .contentShape(Rectangle())
+                                .opacity(plant.isDone ? 0.5 : 1)
+                                // الضغط على النبتة: نحفظها في editingPlant، فتفتح صفحة التعديل
+                                .onTapGesture {
+                                    editingPlant = plant
+                                }
+                            }
+                            // 🆕 List كانت تعطي مسافة من الجوانب تلقائيًا، الحين نحطها بأنفسنا
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
                         }
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
 
-                        // اسم النبتة
-                        Text(plant.name)
-                            .font(.title3)
-
-                        // الشارتين: الإضاءة والماء
-                        HStack(spacing: 6) {
-                            badge(plant.light, icon: "sun.max", iconColor: Color("Yellow"), textColor: Color("gray"))
-                            badge(plant.water, icon: "drop", iconColor: Color("LightCyan"), textColor: Color("LightCyan"))
-                        }
+                        // 🆕 الخط الفاصل بين الصفوف (List كانت تسويه بنفسها)
+                        Rectangle()
+                            .fill(Color("dividerColor"))
+                            .frame(height: 1)
                     }
-                    // نخلي النص ياخذ كل العرض عشان منطقة الضغط تكون كبيرة
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    // contentShape: يخلي الضغط يشتغل حتى على الفراغات
-                    .contentShape(Rectangle())
-                    // الضغط على النبتة: نحفظها في editingPlant، فتفتح صفحة التعديل
-                    .onTapGesture {
-                        editingPlant = plant
-                    }
-                }
-                .padding(.vertical, 4)
-                // النبتة اللي انسقت يخف لونها مثل التصميم
-                .opacity(plant.isDone ? 0.5 : 1)
-                // السحب للحذف: يطلع زر سلة لما تسحب الصف لليسار
-                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    Button(role: .destructive) {
-                        viewModel.delete(plant)
-                    } label: {
-                        Image(systemName: "trash")
-                    }
-                    .tint(.red)
                 }
             }
-            .listStyle(.plain)
+            // 🆕 شلنا .listStyle(.plain) لأنه خاص بـ List
             .padding(.top, 20)
 
             // صفحة التعديل: تفتح لما editingPlant يصير فيه نبتة
@@ -133,9 +142,9 @@ struct TodayReminder: View {
                 )
             }
         }
-        // الصفحة تاخذ كل الشاشة، وتمتد تحت الشريط العلوي والسفلي
         .frame(maxHeight: .infinity)
         .ignoresSafeArea()
+
         // زر +: يطلع فوق الصفحة في الزاوية تحت اليمين
         .overlay(alignment: .bottomTrailing) {
             Button {
@@ -183,6 +192,84 @@ struct TodayReminder: View {
     }
 }
 
+// 🆕 ───────── صندوق السحب للحذف (SwipeToDelete) ─────────
+// الفكرة: طبقتين فوق بعض
+// تحت: زر السلة الأحمر | فوق: الصف بخلفية سودا يغطي الزر
+// لما تسحبين الصف لليسار يتحرك، فيبان الزر اللي تحته
+struct SwipeToDelete<Content: View>: View {
+
+    // أمر الحذف: اللي يستخدم الصندوق يقرر وش يصير لما تضغطين السلة
+    var onDelete: () -> Void
+
+    // @ViewBuilder: يخلي الصندوق يقبل أي شكل داخله (مثل VStack)
+    @ViewBuilder var content: Content
+
+    // كم تحرك الصف لليسار (0 = مكانه الطبيعي، بالسالب = يسار)
+    @State private var offset: CGFloat = 0
+
+    // هل الصف مفتوح (زر الحذف ظاهر)
+    @State private var isOpen = false
+
+    // كم يتحرك الصف عشان يبان الزر
+    private let openWidth: CGFloat = 72
+
+    var body: some View {
+        // ZStack: يحط العناصر فوق بعض، و trailing يخلي الزر على اليمين
+        ZStack(alignment: .trailing) {
+
+            // الطبقة اللي تحت: زر السلة
+            Button {
+                // نرجع الصف مكانه بحركة ناعمة، بعدين نحذف
+                withAnimation(.spring) {
+                    offset = 0
+                    isOpen = false
+                }
+                onDelete()
+            } label: {
+                Image(systemName: "trash")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 44, height: 30)
+                    // Capsule: كبسولة صغيرة مثل التصميم (مو دائرة كبيرة)
+                    .background(Color(red: 0.93, green: 0.33, blue: 0.33), in: Capsule())
+            }
+            .padding(.trailing, 16)
+            // الزر ما يبان إلا إذا الصف تحرك
+            .opacity(offset < 0 ? 1 : 0)
+
+            // الطبقة اللي فوق: الصف نفسه
+            content
+                // خلفية سودا تغطي الزر وهو مقفول (وبدون مربع رمادي)
+                .background(Color.black)
+                // offset: يزحزح الصف يمين/يسار بدون ما يأثر على اللي حوله
+                .offset(x: offset)
+                // DragGesture: يتابع إصبعك وأنتِ تسحبين
+                .gesture(
+                    DragGesture(minimumDistance: 20)
+                        // onChanged: يشتغل كل ما تحرك إصبعك
+                        .onChanged { value in
+                            // نتأكد إن السحب أفقي عشان ما يخرب سكرول الصفحة
+                            guard abs(value.translation.width) > abs(value.translation.height) else { return }
+                            // إذا الصف مفتوح نبدأ من مكانه المفتوح
+                            let start: CGFloat = isOpen ? -openWidth : 0
+                            // min(0): ما يروح يمين | max: ما يروح يسار زيادة عن اللزوم
+                            offset = min(0, max(start + value.translation.width, -openWidth * 1.5))
+                        }
+                        // onEnded: يشتغل لما ترفعين إصبعك
+                        .onEnded { _ in
+                            withAnimation(.spring) {
+                                // إذا سحبتي أكثر من النص يفتح، وإلا يرجع مكانه
+                                isOpen = offset < -openWidth / 2
+                                offset = isOpen ? -openWidth : 0
+                            }
+                        }
+                )
+        }
+        // clipped: يقص أي شي يطلع برا حدود الصف
+        .clipped()
+    }
+}
+
 // الـ Preview: نسوي صندوق فيه نبتتين تجريبيتين عشان نشوف شكل الصفحة
 #Preview {
     let viewModel = MyPlantModel()
@@ -193,11 +280,10 @@ struct TodayReminder: View {
         .preferredColorScheme(.dark)
 }
 
-// ═════════ صفحة التعديل / الحذف (EditReminder) ═════════
+// صفحة التعديل / الحذف (EditReminder)
 
 struct EditReminder: View {
 
-    // ───────── المعلومات اللي تحتاجها الصفحة ─────────
 
     // النبتة اللي نعدّلها. الصفحة ما تعرف بياناتها بنفسها، اللي يفتحها يعطيها إياها
     var plant: Plant

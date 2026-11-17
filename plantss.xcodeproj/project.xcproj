@@ -17,9 +17,9 @@
       "name": "Products",
       "children": [
         { "path": "<PRODUCTS>/plantss.app", "id": "000000000000000000000120", "type": "wrapper.application", "index": false },
+        { "kind": "folder", "path": "ViewModels", "target-membership": [ "plantss" ] },
       ],
     },
-    { "kind": "folder", "path": "ViewModels", "target-membership": [ "plantss" ] },
   ],
   "targets": [
     {

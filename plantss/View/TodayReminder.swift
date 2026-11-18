@@ -54,8 +54,8 @@ struct TodayReminder: View {
 
 //List تعرض كل نبتة في viewModel.plants بصف لحالها. plant هي النبتة اللي يعرض صفّها الآن.
                     //  الحين ForEach هو اللي يسوي صف لكل نبتة بدل List
-                    ForEach(viewModel.plants) { plant in
-
+                    ForEach(viewModel.sortedPlants) { plant in
+                        
                         SwipeToDelete {
                             withAnimation {
                                 viewModel.delete(plant)
@@ -315,6 +315,8 @@ struct EditReminder: View {
                         .frame(width: 44, height: 44)
                         .background(Color("buttonsColor"), in: Circle())
                 }
+                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                .opacity(name.trimmingCharacters(in: .whitespaces).isEmpty ? 0.4 : 1)
             }
 
             

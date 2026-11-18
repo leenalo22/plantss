@@ -6,6 +6,10 @@ class MyPlantModel {
     
     // يخزّن قائمة النباتات
     var plants: [Plant] = []
+    // اللي ما انسقت فوق، والمسقيّة تحت
+    var sortedPlants: [Plant] {
+        plants.filter { !$0.isDone } + plants.filter { $0.isDone }
+    }
     var hasStarted = false
     // يحدد هل بدأ المستخدم استخدام التطبيق
     enum Screen {case start, home, today, completed}

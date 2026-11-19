@@ -1,5 +1,4 @@
 import Foundation
-
 struct Plant: Identifiable {
     let id = UUID()
     var name: String
@@ -8,8 +7,7 @@ struct Plant: Identifiable {
     var days: String
     var water: String
     var isDone = false
-    var reminderHour: Int = 9
-    var reminderMinute: Int = 0
+   
 }
 
 

@@ -1,44 +1,33 @@
 import SwiftUI
-//الدفتر اللي يحتفظ بكل النباتات ويغيّر بياناتها.
 
 @Observable
 class MyPlantModel {
     
-    // يخزّن قائمة النباتات
     var plants: [Plant] = []
-    // اللي ما انسقت فوق، والمسقيّة تحت
-    var sortedPlants: [Plant] {
-        plants.filter { !$0.isDone } + plants.filter { $0.isDone }
-    }
+   
     var hasStarted = false
-    // يحدد هل بدأ المستخدم استخدام التطبيق
     enum Screen {case start, home, today, completed}
     
     var screen: Screen {
-        //يقرر اي شاشه تظهر
         if !hasStarted { return .start }
-        //اذا المشتخدم مابدا hastated يفتح من البدايه
         if plants.isEmpty { return .home }
-        //إذا قائمة النباتات فاضية، اعرض الشاشة الرئيسية .home اللي تقول ما فيه تذكيرات.
         return plants.allSatisfy(\.isDone) ? .completed : .today
     }
     
     func addPlant(_ plant: Plant) {
-        // 🆕 إذا كل التذكيرات خلصت (كلها ✓)، نمسح القديمة ونبدأ من جديد
         if !plants.isEmpty && plants.allSatisfy(\.isDone) {
-            // نلغي إشعارات النباتات القديمة عشان ما تجي بعدين
+            
             for oldPlant in plants {
                 PlantNotificationManager.cancel(for: oldPlant)
             }
-            // نمسح القائمة كاملة
             plants.removeAll()
         }
 
         plants.append(plant)
         hasStarted = true
+        
         Task { await PlantNotificationManager.schedule(for: plant) }
     }
-    // يتجاوز خطوة البداية
     func skip() {
         hasStarted = true
     }
@@ -58,17 +47,14 @@ class MyPlantModel {
         }
     }
     
-    // كم نبتة انسقت
     var doneCount: Int {
         plants.filter { $0.isDone }.count
     }
     
-    // يحسب نسبة الإنجاز من 0 إلى 1
     var progress: Double {
         plants.isEmpty ? 0 : Double(doneCount) / Double(plants.count)
     }
     
-    // يعرض رسالة حسب عدد النباتات المسقيّة
     var message: String {
         doneCount == 0
         ? "Your plants are waiting for a sip 💦"

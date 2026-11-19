@@ -4,7 +4,6 @@ struct SetReminder: View {
     var onSave: (Plant) -> Void
     var onCancel: () -> Void
 
-    @Environment(\.dismiss) var dismiss
     
     @State private var name = ""
     @State private var room = "Bedroom"
@@ -15,7 +14,6 @@ struct SetReminder: View {
     var body: some View {
         VStack(spacing: 40) {
             
-            // الشريط العلوي
             HStack {
                 Button {
                     onCancel()
@@ -41,15 +39,13 @@ struct SetReminder: View {
                         .background(Color("buttonsColor"), in: Circle())
                 }
                 //الزر ما يشتغل إذا الاسم فاضي
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
-
-                .opacity(name.trimmingCharacters(in: .whitespaces).isEmpty ? 0.4 : 1)
+              
             }
             
-            // اسم النبتة
             HStack {
                 Text("Plant Name")
                 TextField("Pothos", text: $name)
+                
             }
             .padding()
             .background(Color(.systemGray5), in: Capsule())
@@ -62,8 +58,7 @@ struct SetReminder: View {
             }
             .padding(.horizontal)
             .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 24))
-            
-            // Watering Days + Water
+            //عندي 4 صفوف (Room، و Light، و Watering Days، و Water)، فبدل ما أكتب نفس الكود 4 مرات، كتبته مرة وحدة في دالة، وأناديها 4 مرات بمعلومات مختلفة."
             VStack(spacing: 0) {
                 row("drop", "Watering Days", ["Every day", "Every 2 days", "Every 3 days", "Once a week", "Every 10 days", "Every 2 weeks"], $days)
                 Divider()
@@ -78,7 +73,6 @@ struct SetReminder: View {
         .padding(.top, 20)
     }
     
-    // صف واحد: أيقونة + اسم + قائمة اختيار
     func row(_ icon: String, _ title: String, _ options: [String], _ selection: Binding<String>) -> some View {
         HStack {
             Label(title, systemImage: icon)
@@ -92,7 +86,6 @@ struct SetReminder: View {
         .frame(height: 40)
     }
 }
-    // الـ Preview يعرضها كـ Sheet مثل التصميم
 #Preview {
     SetReminder(
         onSave: { _ in },

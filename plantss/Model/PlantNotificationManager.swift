@@ -2,7 +2,6 @@ import UserNotifications
 
 enum PlantNotificationManager {
     static func schedule(for plant: Plant) async {
-        //يجيب مركز الإشعارات
         let center = UNUserNotificationCenter.current()
 
         do {

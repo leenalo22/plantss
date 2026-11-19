@@ -4,7 +4,9 @@ import SwiftUI
 class MyPlantModel {
     
     var plants: [Plant] = []
-   
+    var sortedPlants: [Plant] {
+        plants.filter { !$0.isDone } + plants.filter { $0.isDone }
+    }
     var hasStarted = false
     enum Screen {case start, home, today, completed}
     
